@@ -1,0 +1,17 @@
+﻿<Window x:Class="JG.Duplicates.Client.Shell"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cal="http://www.codeplex.com/prism"
+        xmlns:Common="clr-namespace:JG.Duplicates.Client"
+        Title="Shell" Height="350" Width="725">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+    <!--<ItemsControl Name="MainRegion" cal:RegionManager.RegionName="{x:Static Common:RegionNames.DuplicateFilesRegion}" />-->
+
+        <ContentControl Grid.Column="0" cal:RegionManager.RegionName="{x:Static Common:RegionNames.DuplicateFilesRegion}" />
+        <ContentControl Grid.Column="1" cal:RegionManager.RegionName="{x:Static Common:RegionNames.FileCompareRegion}" />
+    </Grid>
+</Window>
