@@ -32,10 +32,9 @@ namespace JG.DuplicateFiles
 
             FileComparer fileCompare = new FileComparer();
 
-            var distinctFiles = sourceFiles.Except(comparisonLocationFiles, fileCompare)
-                .Select((t, v) => new FileCompareInfo()
+            var distinctFiles = sourceFiles.Intersect(comparisonLocationFiles, fileCompare)
+                .Select(t => new FileCompareInfo()
                 {
-                    SourceFileInfo = t,
                     DuplicateFileInfo = t
                 }
                 );

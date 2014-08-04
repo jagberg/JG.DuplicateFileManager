@@ -9,8 +9,6 @@ namespace JG.DuplicateFiles.Domain
 {
     public class FileCompareInfo
     {
-        public FileInfo SourceFileInfo { get; set; }
-
         public FileInfo DuplicateFileInfo { get; set; }
 
     }

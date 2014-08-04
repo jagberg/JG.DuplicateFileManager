@@ -13,17 +13,17 @@ namespace JG.DuplicateFiles
 
         public List<FileTreeInfo> FileTreeList { get { return this.treeList; } }
 
-        public FileTree(string rootLocation)
+        public FileTree(string rootLocation, string[] searchFileTypes)
         {
             treeList = new List<FileTreeInfo>();
-            this.LoadFileTree(rootLocation);
+            this.LoadFileTree(rootLocation, searchFileTypes);
         }
 
-        public void LoadFileTree(string rootLocation)
+        public void LoadFileTree(string rootLocation, string[] searchFileTypes)
         {
             DirectoryInfo dir1 = new DirectoryInfo(rootLocation);
 
-            string[] extensions = new[] { ".jpg", ".bmp", ".jpeg" };
+            string[] extensions = searchFileTypes;
 
             IEnumerable<System.IO.FileInfo> files = dir1.EnumerateFiles("*.*", System.IO.SearchOption.AllDirectories)
                                                             .Where(f => extensions.Contains(f.Extension, StringComparer.OrdinalIgnoreCase));
@@ -34,7 +34,7 @@ namespace JG.DuplicateFiles
             .Select(x => new FileTreeInfo()
             {
                 DuplicateCount = x.Count(),
-                ChildFiles = x.Select(y => new FileTreeInfo() { ID = y.FullName }).ToList(),
+                ChildFiles = x.Select(y => new FileTreeInfo() { ID = y.FullName, FileInfo = y }).ToList(),
                 FileInfo = x.Key,
                 ID = x.First().Name
             })

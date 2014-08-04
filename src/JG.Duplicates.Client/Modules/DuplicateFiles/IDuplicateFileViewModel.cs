@@ -1,14 +1,14 @@
-﻿using Microsoft.Practices.Prism.Commands;
-using System;
+﻿using System;
 namespace JG.Duplicates.Client.Modules
 {
     public interface IDuplicateFileViewModel
     {
-        System.Windows.Input.ICommand LoadRootComparisonClickCommand { get; }
-        System.Collections.Generic.List<JG.DuplicateFiles.FileTreeInfo> MyFileTree { get; set; }
-        event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        global::System.Threading.Tasks.Task LoadRootComparisonAsync();
+        global::Microsoft.Practices.Prism.Commands.DelegateCommand LoadRootComparisonClickCommand { get; }
+        global::System.Collections.Generic.List<global::JG.DuplicateFiles.FileTreeInfo> MyFileTree { get; set; }
+        event global::System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         string RootLocation { get; set; }
-
-        DelegateCommand SelectedFolder { get; set; }
+        global::JG.DuplicateFiles.FileTreeInfo SelectedFileItem { get; set; }
+        global::Microsoft.Practices.Prism.Commands.DelegateCommand SelectedFolder { get; set; }
     }
 }

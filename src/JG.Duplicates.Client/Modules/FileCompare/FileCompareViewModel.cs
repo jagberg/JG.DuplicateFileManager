@@ -1,4 +1,5 @@
 ﻿using JG.DuplicateFiles;
+using JG.DuplicateFiles.Domain;
 using JG.Duplicates.Client.Events;
 using Microsoft.Practices.Prism.PubSubEvents;
 using System;
@@ -18,7 +19,7 @@ namespace JG.Duplicates.Client.Modules
         #region INotifyPropertyChanged Members
 
         private ICommand _loadCompareCommand;
-        private bool _canLoadCompareExecute;
+        private bool _canLoadCompareExecute = true;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -50,6 +51,20 @@ namespace JG.Duplicates.Client.Modules
             }
         }
 
+        private List<FileCompareInfo> _duplicateList;
+        public List<FileCompareInfo> DuplicateList
+        {
+            set
+            {
+                this._duplicateList = value;
+                OnPropertyChanged("DuplicateList");
+            }
+            get
+            {
+                return this._duplicateList;
+            }
+        }
+
         public ICommand LoadCompareClickCommand
         {
             get
@@ -63,6 +78,9 @@ namespace JG.Duplicates.Client.Modules
             this.eventAggregator = eventAggregator;
 
             InitializeEventAggregatorSubscriptions();
+
+            this.FirstLocation = @"\\justin-nas\AllDisk\Pictures\Wedding\Different";
+            this.SecondLocation = @"\\justin-nas\AllDisk\Pictures\Wedding\Agreed";
         }
 
         private void InitializeEventAggregatorSubscriptions()
@@ -80,7 +98,7 @@ namespace JG.Duplicates.Client.Modules
         private void LoadComparison()
         {
             FileCompare fileCompare = new FileCompare();
-            fileCompare.GetDuplicateFiles(this.FirstLocation, this.SecondLocation);
+            this.DuplicateList = fileCompare.GetDuplicateFiles(this.FirstLocation, this.SecondLocation);
         }
 
         protected virtual void OnPropertyChanged(string propertyName)

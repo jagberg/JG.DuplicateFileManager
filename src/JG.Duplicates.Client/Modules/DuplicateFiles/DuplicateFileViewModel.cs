@@ -12,6 +12,7 @@ using JG.Duplicates.Client.Modules;
 using Microsoft.Practices.Prism.PubSubEvents;
 using Microsoft.Practices.Unity;
 using JG.Duplicates.Client.Events;
+using System.IO;
 
 namespace JG.Duplicates.Client
 {
@@ -19,15 +20,14 @@ namespace JG.Duplicates.Client
     {
         private List<FileTreeInfo> _fileTree;
         private string _rootLocation;
+        private string _searchFileTypes;
 
-        private ICommand _clickCommand;
-        private ICommand _fileSelectionChangedCommand;
-        private bool _canExecute;
+        private DelegateCommand _loadComparisonCommand;
+        private bool _canLoadComparisonExecute;
 
         public DelegateCommand SelectedFolder { get; set; }
 
         private readonly IEventAggregator eventAggregator;
-
 
         public List<FileTreeInfo> MyFileTree
         {
@@ -55,20 +55,77 @@ namespace JG.Duplicates.Client
             }
         }
 
-        public ICommand LoadRootComparisonClickCommand
+        public string SearchFileTypes
         {
+            set
+            {
+                this._searchFileTypes = value;
+                OnPropertyChanged("SearchFileTypes");
+            }
             get
             {
-                return _clickCommand ?? (_clickCommand = new CommandHandler(() => LoadRootComparison(), _canExecute));
+                return this._searchFileTypes;
             }
         }
 
-
-        public ICommand FileSelectionChangedCommand
+        public string[] SearchFileTypesList
         {
             get
             {
-                return _fileSelectionChangedCommand ?? (_fileSelectionChangedCommand = new CommandHandler(() => FileSelectionChanged(), _canExecute));
+                try
+                {
+                    string[] splitSearchFileTypeList = this.SearchFileTypes.Split('|');
+
+                    return splitSearchFileTypeList;
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException("Invalid File Type format entered.");
+                }
+            }
+        }
+
+        private FileTreeInfo _selectedFileItem;
+        public FileTreeInfo SelectedFileItem
+        {
+            set
+            {
+                this._selectedFileItem = value;
+
+                PublishFileSelectionChanged(this._selectedFileItem.FileInfo);
+
+                OnPropertyChanged("SelectedFileItem");
+            }
+            get
+            {
+                return this._selectedFileItem;
+            }
+        }
+
+        public DelegateCommand LoadRootComparisonClickCommand
+        {
+            get
+            {
+                return _loadComparisonCommand ?? (_loadComparisonCommand = new DelegateCommand(
+                async () =>
+                {
+                    await LoadRootComparisonAsync();
+                }, CanLoadComparisonExecute));
+
+                //return _clickCommand ?? (_clickCommand = new CommandHandler(() => LoadRootComparison(), _canExecute));
+            }
+        }
+
+        public bool IsLoading
+        {
+            get
+            {
+                return !this._canLoadComparisonExecute;
+            }
+            set
+            {
+                this._canLoadComparisonExecute = !value;
+                this.LoadRootComparisonClickCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -82,30 +139,41 @@ namespace JG.Duplicates.Client
         private void Initialize()
         {
             this.RootLocation = @"\\justin-nas\AllDisk\Pictures\Wedding";
+            this.SearchFileTypes = @".jpg|.bmp|.jpeg";
 
-            this._canExecute = true;
+            this._canLoadComparisonExecute = true;
+        }
+
+        private bool CanLoadComparisonExecute()
+        {
+            return _canLoadComparisonExecute;
+        }
+
+        public Task LoadRootComparisonAsync()
+        {
+            return Task.Run(() => LoadRootComparison());
         }
 
         private void LoadRootComparison()
         {
             try
             {
-                this._canExecute = false;
+                this.IsLoading = true;
 
-                this.MyFileTree = new FileTree(this.RootLocation).FileTreeList;
+                this.MyFileTree = new FileTree(this.RootLocation, this.SearchFileTypesList).FileTreeList;
             }
             finally
             {
-                this._canExecute = true;
+                this.IsLoading = false;
             }
         }
 
-        private void FileSelectionChanged()
+        private void PublishFileSelectionChanged(FileInfo fileInfo)
         {
             // Publish the events.
             this.eventAggregator
                 .GetEvent<FileSelectionEvent>()
-                .Publish(new FileSelectionEventArgs());
+                .Publish(new FileSelectionEventArgs(fileInfo));
         }
 
 

@@ -33,6 +33,11 @@
             <Button Content="Compare" Command="{Binding LoadCompareClickCommand}"  Foreground="Black" Margin="4,4,4,4"  Grid.Column="2" Grid.Row="2" Width="120" HorizontalAlignment="Right" />
 
         </Grid>
-        <DataGrid Grid.Row="1" />
+        <DataGrid Grid.Row="1" ItemsSource="{Binding DuplicateList}" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=DuplicateFileInfo.Name}" Header="File Name" />
+                <DataGridTextColumn Binding="{Binding Path=DuplicateFileInfo.DirectoryName}" Header="Directory" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </UserControl>
