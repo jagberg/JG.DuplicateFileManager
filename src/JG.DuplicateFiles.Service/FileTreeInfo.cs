@@ -15,10 +15,24 @@ namespace JG.DuplicateFiles
 
         public int DuplicateCount { get; set; }
 
-        public string ID { get; set; }
-
         public FileInfo FileInfo { get; set; }
 
-        public List<FileTreeInfo> ChildFiles { get; set; }
+        public List<FileInfo> ChildFiles { get; set; }
+        //public List<FileTreeDirectoryItemInfo> Directories { get; set; }
+
+    }
+
+    public class FileTreeDirectoryItemInfo
+    {
+        public int DuplicateCount { get; set; }
+
+        public List<FileTreeItemInfo> ChildFiles { get; set; }
+    }
+
+    public class FileTreeItemInfo
+    {
+        public int DuplicateCount { get; set; }
+
+        public FileInfo FileInfo { get; set; }
     }
 }

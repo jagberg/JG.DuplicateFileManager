@@ -43,27 +43,25 @@
             <TreeView ItemsSource="{Binding MyFileTree}" Margin="2" Grid.Row="1" >
                 <i:Interaction.Behaviors>
                     <local:TreeViewSelectedItemBehavior
-                    SelectedItem="{Binding SelectedFileItem}" />
+                    SelectedItem="{Binding DirectoryName}" />
                 </i:Interaction.Behaviors>
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding ChildFiles}">
+                    <HierarchicalDataTemplate ItemsSource="{Binding DirList}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Path=ID}" />
-                            <TextBlock Text="{Binding Path=FileInfo.DirectoryName}" />
+                            <TextBlock Text="{Binding Path=DirectoryName}" />
                         </StackPanel>
 
                         <HierarchicalDataTemplate.ItemTemplate>
-                            <HierarchicalDataTemplate  ItemsSource="{Binding ChildFiles}">
+                            <HierarchicalDataTemplate  ItemsSource="{Binding Children}">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Path=ID}" />
-                                    <TextBlock Text="{Binding DuplicateCount, StringFormat=' ({0})'}" />
+                                    <TextBlock Text="{Binding Path=DirectoryName}" />
                                 </StackPanel>
 
                                 <HierarchicalDataTemplate.ItemTemplate>
                                     <HierarchicalDataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Path=ID}" />
-                                            <TextBlock Text="{Binding Path=FileInfo.DirectoryName}" />
+                                            <TextBlock Text="{Binding Path=FileInfo.Name}" />
+                                            <TextBlock Text="{Binding DuplicateCount, StringFormat=' ({0})'}" />
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
 

@@ -13,12 +13,13 @@ using Microsoft.Practices.Prism.PubSubEvents;
 using Microsoft.Practices.Unity;
 using JG.Duplicates.Client.Events;
 using System.IO;
+using System.Collections;
 
 namespace JG.Duplicates.Client
 {
     public class DuplicateFileViewModel : INotifyPropertyChanged, IDuplicateFileViewModel
     {
-        private List<FileTreeInfo> _fileTree;
+        private List<FileTreeDirectory> _fileTree;
         private string _rootLocation;
         private string _searchFileTypes;
 
@@ -29,7 +30,7 @@ namespace JG.Duplicates.Client
 
         private readonly IEventAggregator eventAggregator;
 
-        public List<FileTreeInfo> MyFileTree
+        public List<FileTreeDirectory> MyFileTree
         {
             set
             {
@@ -92,7 +93,7 @@ namespace JG.Duplicates.Client
             {
                 this._selectedFileItem = value;
 
-                PublishFileSelectionChanged(this._selectedFileItem.FileInfo);
+                //PublishFileSelectionChanged(this._selectedFileItem.DirectoryInfo.);
 
                 OnPropertyChanged("SelectedFileItem");
             }
@@ -138,7 +139,7 @@ namespace JG.Duplicates.Client
 
         private void Initialize()
         {
-            this.RootLocation = @"\\justin-nas\AllDisk\Pictures\Wedding";
+            this.RootLocation = @"C:\Temp\Pics";
             this.SearchFileTypes = @".jpg|.bmp|.jpeg";
 
             this._canLoadComparisonExecute = true;
@@ -154,18 +155,130 @@ namespace JG.Duplicates.Client
             return Task.Run(() => LoadRootComparison());
         }
 
-        private void LoadRootComparison()
+        public void LoadRootComparison()
         {
             try
             {
                 this.IsLoading = true;
 
-                this.MyFileTree = new FileTree(this.RootLocation, this.SearchFileTypesList).FileTreeList;
+                var fileTree = new FileTree(this.RootLocation, this.SearchFileTypesList).FileTreeList;
+
+                var tree = GetTreeViewModel(fileTree);
+                this.MyFileTree = tree.ToList();
+                //var tl = tree.ToList();
+                //Children = (from b in g
+                //                          join c in fileTree on b.Name equals c.Name
+                //                         // where c.DirectoryName != g.FirstOrDefault().DirectoryName
+                //                          group c by b.DirectoryName into g2
+                //                          select new FileItemInfo()
+                //                          {
+                //                              FileInfo = g2.FirstOrDefault(),
+                //                              DirectoryName = g2.FirstOrDefault().DirectoryName,
+                //                              Children = (from d in g2
+                //                                          group g2 by d.Name into g3
+                //                                          select new FileItemInfo()
+                //                                          {
+                //                                              Unknown = g3
+                //                                          }).ToList()
+                //                          }).ToList()
+
+
+                // Group by first component (before /)
+
             }
             finally
             {
                 this.IsLoading = false;
             }
+        }
+
+        private IEnumerable<FileTreeDirectory> GetTreeViewModel(List<FileInfo> fileTree)
+        {
+            //var dirs = from s in fileTree
+            //           group s by s.DirectoryName into g
+            //           select new { DirName = g.FirstOrDefault().DirectoryName };
+
+            //List<FileItemInfo> fil = new List<FileItemInfo>();
+            //foreach (var item in dirs)
+            //{
+            //    FileItemInfo fi = new FileItemInfo() { DirectoryName = item.DirName };
+
+            //    string childDir = "";
+            //    foreach (var file in fileTree.Where(x => x.DirectoryName == item.DirName))
+            //    {
+            //        var tr = from s in fileTree
+            //                 where s.DirectoryName != file.DirectoryName && file.Name.Contains(s.Name)
+            //                 select s;
+
+            //        FileItemInfo childDirItem = null;
+            //        foreach (var dupFile in tr)
+            //        {
+            //            // Get distinct directories
+            //            if (childDir != dupFile.DirectoryName)
+            //            {
+            //                if (childDir != "")
+            //                {
+            //                    fi.Children.Add(childDirItem);
+            //                }
+
+            //                childDirItem = new FileItemInfo() { DirectoryName = dupFile.DirectoryName, Children = new List<FileItemInfo>() };
+            //            }
+
+            //            childDirItem.Children.Add(new FileItemInfo() { FileInfo = dupFile });
+            //        }
+            //        fil.Add(fi);
+            //    }
+            //}
+            //return fil;
+            var test = from s in fileTree
+                       from t in fileTree
+                       where s.DirectoryName != t.DirectoryName && s.Name == t.Name
+                       orderby s.DirectoryName, t.DirectoryName
+                       select new FileItemInfoFlat { DirectoryNameA = s.DirectoryName, DirectoryNameB = t.DirectoryName, FileInfo = s };
+
+            var tree = from s in test
+                       group s by s.DirectoryNameA into grpA
+                       select new FileTreeDirectory()
+                       {
+                           DirectoryName = grpA.FirstOrDefault().DirectoryNameA,
+                           DirList = (from v in test
+                                      where v.DirectoryNameA == grpA.FirstOrDefault().DirectoryNameA
+                                      group v by v.DirectoryNameB into grpB
+                                      select new FileDirectoryInfo()
+                                      {
+                                          DirectoryName = grpB.FirstOrDefault().DirectoryNameB,
+                                          Children = (from t in test
+                                                      where t.DirectoryNameA == grpB.FirstOrDefault().DirectoryNameA
+                                                      && t.DirectoryNameB == grpB.FirstOrDefault().DirectoryNameB
+                                                      select new FileItemInfo()
+                                           {
+                                               DirectoryName = t.DirectoryNameB,
+                                               FileInfo = t.FileInfo
+                                           }).ToList()
+                                      }).ToList()
+                       };
+            var x = 1;
+            //var tree =
+            //          from s in fileTree
+            //          group s by s.DirectoryName into g
+            //          select new FileItemInfo()
+            //          {
+            //              DirectoryName = g.FirstOrDefault().DirectoryName,
+            //              FileInfo = g.FirstOrDefault(),
+            //              Unknown = g,
+            //              Children = (from c in fileTree
+            //                          where c.Name.Contains(g.FirstOrDefault().Name)
+            //                          // && c.DirectoryName != g.FirstOrDefault().DirectoryName
+            //                          group c by c.DirectoryName into g2
+            //                          select new FileItemInfo()
+            //                          {
+            //                              Unknown = g2, // this should sovle the issue
+            //                              FileInfo = g2.FirstOrDefault(),
+            //                              DirectoryName = g2.FirstOrDefault().DirectoryName,
+            //                              Children = g2.Select(t => new FileItemInfo() { FileInfo = t }).ToList()
+            //                          }).ToList()
+            //          };
+            return tree;
         }
 
         private void PublishFileSelectionChanged(FileInfo fileInfo)
@@ -175,6 +288,21 @@ namespace JG.Duplicates.Client
                 .GetEvent<FileSelectionEvent>()
                 .Publish(new FileSelectionEventArgs(fileInfo));
         }
+
+        //public List<Node> BuildTree(IEnumerable<FileInfo> fileInfo, int parentId)
+        //{
+        //    return (
+        //      from s in fileInfo
+        //      group s by s.DirectoryName into g  // Group by first component (before /)
+        //      select new Node
+        //      {
+        //          Name = g.Key,
+        //          Children = BuildTree(            // Recursively build children
+        //            from s in g
+        //            select s, ) // Select remaining components
+        //      }
+        //      ).ToList();
+        //}
 
 
         #region INotifyPropertyChanged Members
@@ -188,6 +316,37 @@ namespace JG.Duplicates.Client
         }
 
         #endregion // INotifyPropertyChanged Members
+    }
+
+    public class FileTreeDirectory
+    {
+        public string DirectoryName { get; set; }
+
+        public List<FileDirectoryInfo> DirList { get; set; }
+    }
+
+    public class FileDirectoryInfo
+    {
+        public string DirectoryName { get; set; }
+
+        public List<FileItemInfo> Children { get; set; }
+    }
+
+    public class FileItemInfo
+    {
+        public string DirectoryName { get; set; }
+
+        public FileInfo FileInfo { get; set; }
+    }
+
+    public class FileItemInfoFlat
+    {
+        public string DirectoryNameA { get; set; }
+
+        public string DirectoryNameB { get; set; }
+
+        public FileInfo FileInfo { get; set; }
+
     }
 
 
