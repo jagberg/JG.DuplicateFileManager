@@ -9,7 +9,7 @@ namespace JG.Duplicates.Client.Modules
         global::System.Collections.Generic.List<DuplicateFileTree> MyFileTree { get; set; }
         event global::System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         string RootLocation { get; set; }
-        global::JG.DuplicateFiles.FileTreeInfo SelectedFileItem { get; set; }
+        ITreeItem SelectedFileItem { get; set; }
         global::Microsoft.Practices.Prism.Commands.DelegateCommand SelectedFolder { get; set; }
     }
 }

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace JG.Duplicates.Client
 {
-    public class FileItemInfo
+    public class FileItemInfo : ITreeItem
     {
-        public string DirectoryName { get; set; }
+        public DirectoryInfo DirectoryName { get; set; }
 
         public FileInfo FileInfo { get; set; }
     }

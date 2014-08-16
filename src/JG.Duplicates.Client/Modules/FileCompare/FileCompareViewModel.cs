@@ -106,7 +106,7 @@ namespace JG.Duplicates.Client.Modules
 
         private void SetComparisonLocation(FileSelectionEventArgs args)
         {
-            this.FirstLocation = args.FileInfo.Directory.FullName;
+            this.FirstLocation = args.FileInfo.DirectoryName.ToString(); //.FileInfo.Directory.FullName;
         }
 
         private void LoadComparison()

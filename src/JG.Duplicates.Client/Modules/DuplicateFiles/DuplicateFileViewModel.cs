@@ -86,14 +86,14 @@ namespace JG.Duplicates.Client
             }
         }
 
-        private FileTreeInfo _selectedFileItem;
-        public FileTreeInfo SelectedFileItem
+        private ITreeItem _selectedFileItem;
+        public ITreeItem SelectedFileItem
         {
             set
             {
                 this._selectedFileItem = value;
 
-                PublishFileSelectionChanged(this._selectedFileItem.FileInfo);
+                PublishFileSelectionChanged(this._selectedFileItem);
 
                 OnPropertyChanged("SelectedFileItem");
             }
@@ -194,7 +194,7 @@ namespace JG.Duplicates.Client
                                 join t in fileTree on s.Name equals t.Name
                                 where s.DirectoryName != t.DirectoryName
                                 orderby s.DirectoryName, t.DirectoryName
-                                select new FileItemInfoFlat { DirectoryNameFirst = s.DirectoryName, DirectoryNameSecond = t.DirectoryName, FileInfo = s };
+                                select new FileItemInfoFlat { DirectoryNameFirst = s.Directory, DirectoryNameSecond = t.Directory, FileInfo = s };
 
 
             //var crossJoinFileTest = fileTree.SelectMany(t1 => fileTree.Select(t2 => Tuple.Create(t1, t2)))
@@ -212,23 +212,31 @@ namespace JG.Duplicates.Client
             objStopWatch.Reset();
             objStopWatch.Start();
 
+
+            var test = from s in crossJoinFileList
+                       group s by s.DirectoryNameFirst.Name into grpA
+                       select new 
+                       {
+                           DirectoryName = grpA.FirstOrDefault().DirectoryNameFirst
+                       };
+
             // Create a tree view from the cross join. Each child will be have its own cross join set which is joined to the parent.
             // The comparison is based on the directory and file name. 
             // TODO: This can be improved so that files that are the same but have different name can be compared.
             var tree = from s in crossJoinFileList
-                       group s by s.DirectoryNameFirst into grpA
+                       group s by s.DirectoryNameFirst.Name into grpA
                        select new DuplicateFileTree()
                        {
                            DirectoryName = grpA.FirstOrDefault().DirectoryNameFirst,
                            DirList = (from v in crossJoinFileList
-                                      where v.DirectoryNameFirst == grpA.FirstOrDefault().DirectoryNameFirst
-                                      group v by v.DirectoryNameSecond into grpB
+                                      where v.DirectoryNameFirst.Name == grpA.FirstOrDefault().DirectoryNameFirst.Name
+                                      group v by v.DirectoryNameSecond.Name into grpB
                                       select new DuplicateDirectoryList()
                                       {
                                           DirectoryName = grpB.FirstOrDefault().DirectoryNameSecond,
                                           Children = (from t in crossJoinFileList
-                                                      where t.DirectoryNameFirst == grpB.FirstOrDefault().DirectoryNameFirst
-                                                      && t.DirectoryNameSecond == grpB.FirstOrDefault().DirectoryNameSecond
+                                                      where t.DirectoryNameFirst.Name == grpB.FirstOrDefault().DirectoryNameFirst.Name
+                                                      && t.DirectoryNameSecond.Name == grpB.FirstOrDefault().DirectoryNameSecond.Name
                                                       select new FileItemInfo()
                                            {
                                                DirectoryName = t.DirectoryNameSecond,
@@ -242,7 +250,7 @@ namespace JG.Duplicates.Client
             return tree;
         }
 
-        private void PublishFileSelectionChanged(FileInfo fileInfo)
+        private void PublishFileSelectionChanged(ITreeItem fileInfo)
         {
             // Publish the events.
             this.eventAggregator
@@ -281,9 +289,9 @@ namespace JG.Duplicates.Client
 
     public class FileItemInfoFlat
     {
-        public string DirectoryNameFirst { get; set; }
+        public DirectoryInfo DirectoryNameFirst { get; set; }
 
-        public string DirectoryNameSecond { get; set; }
+        public DirectoryInfo DirectoryNameSecond { get; set; }
 
         public FileInfo FileInfo { get; set; }
 

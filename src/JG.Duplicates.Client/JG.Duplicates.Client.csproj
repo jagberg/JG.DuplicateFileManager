@@ -104,6 +104,7 @@
     <Compile Include="Models\DuplicateDirectoryList.cs" />
     <Compile Include="Models\FileItemInfo.cs" />
     <Compile Include="Models\FileTreeDirectory.cs" />
+    <Compile Include="Models\ITreeItem.cs" />
     <Compile Include="Modules\DuplicateFiles\DuplicateFilesModule.cs" />
     <Compile Include="Modules\DuplicateFiles\DuplicateFilesView.xaml.cs">
       <DependentUpon>DuplicateFilesView.xaml</DependentUpon>

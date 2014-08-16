@@ -9,9 +9,9 @@ namespace JG.Duplicates.Client.Events
 {
     public sealed class FileSelectionEventArgs : EventArgs
     {
-        public FileInfo FileInfo { get; set; }
+        public ITreeItem FileInfo { get; set; }
 
-        public FileSelectionEventArgs(FileInfo fileInfo)
+        public FileSelectionEventArgs(ITreeItem fileInfo)
         {
             this.FileInfo = fileInfo;
         }

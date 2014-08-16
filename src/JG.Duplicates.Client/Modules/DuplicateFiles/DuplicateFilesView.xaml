@@ -43,7 +43,7 @@
             <TreeView ItemsSource="{Binding MyFileTree}" Margin="2" Grid.Row="1" >
                 <i:Interaction.Behaviors>
                     <local:TreeViewSelectedItemBehavior
-                    SelectedItem="{Binding DirectoryName}" />
+                    SelectedItem="{Binding SelectedFileItem}" />
                 </i:Interaction.Behaviors>
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding DirList}">
