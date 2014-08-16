@@ -49,19 +49,20 @@
                     <HierarchicalDataTemplate ItemsSource="{Binding DirList}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Path=DirectoryName}" />
+                            <TextBlock Text="{Binding TotalDuplicates, StringFormat=' ({0})'}" />
                         </StackPanel>
 
                         <HierarchicalDataTemplate.ItemTemplate>
                             <HierarchicalDataTemplate  ItemsSource="{Binding Children}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{Binding Path=DirectoryName}" />
+                                    <TextBlock Text="{Binding Children.Count, StringFormat=' ({0})'}" />
                                 </StackPanel>
 
                                 <HierarchicalDataTemplate.ItemTemplate>
                                     <HierarchicalDataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Path=FileInfo.Name}" />
-                                            <TextBlock Text="{Binding DuplicateCount, StringFormat=' ({0})'}" />
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
 

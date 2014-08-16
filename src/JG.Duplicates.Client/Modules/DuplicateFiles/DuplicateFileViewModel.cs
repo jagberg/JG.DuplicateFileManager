@@ -19,7 +19,7 @@ namespace JG.Duplicates.Client
 {
     public class DuplicateFileViewModel : INotifyPropertyChanged, IDuplicateFileViewModel
     {
-        private List<FileTreeDirectory> _fileTree;
+        private List<DuplicateFileTree> _fileTree;
         private string _rootLocation;
         private string _searchFileTypes;
 
@@ -30,7 +30,7 @@ namespace JG.Duplicates.Client
 
         private readonly IEventAggregator eventAggregator;
 
-        public List<FileTreeDirectory> MyFileTree
+        public List<DuplicateFileTree> MyFileTree
         {
             set
             {
@@ -93,7 +93,7 @@ namespace JG.Duplicates.Client
             {
                 this._selectedFileItem = value;
 
-                //PublishFileSelectionChanged(this._selectedFileItem.DirectoryInfo.);
+                PublishFileSelectionChanged(this._selectedFileItem.FileInfo);
 
                 OnPropertyChanged("SelectedFileItem");
             }
@@ -165,26 +165,6 @@ namespace JG.Duplicates.Client
 
                 var tree = GetTreeViewModel(fileTree);
                 this.MyFileTree = tree.ToList();
-                //var tl = tree.ToList();
-                //Children = (from b in g
-                //                          join c in fileTree on b.Name equals c.Name
-                //                         // where c.DirectoryName != g.FirstOrDefault().DirectoryName
-                //                          group c by b.DirectoryName into g2
-                //                          select new FileItemInfo()
-                //                          {
-                //                              FileInfo = g2.FirstOrDefault(),
-                //                              DirectoryName = g2.FirstOrDefault().DirectoryName,
-                //                              Children = (from d in g2
-                //                                          group g2 by d.Name into g3
-                //                                          select new FileItemInfo()
-                //                                          {
-                //                                              Unknown = g3
-                //                                          }).ToList()
-                //                          }).ToList()
-
-
-                // Group by first component (before /)
-
             }
             finally
             {
@@ -192,92 +172,73 @@ namespace JG.Duplicates.Client
             }
         }
 
-        private IEnumerable<FileTreeDirectory> GetTreeViewModel(List<FileInfo> fileTree)
+        private IEnumerable<DuplicateFileTree> GetTreeViewModel(List<FileInfo> fileTree)
         {
-            //var dirs = from s in fileTree
-            //           group s by s.DirectoryName into g
-            //           select new { DirName = g.FirstOrDefault().DirectoryName };
+            System.Diagnostics.Stopwatch objStopWatch = new System.Diagnostics.Stopwatch();
 
-            //List<FileItemInfo> fil = new List<FileItemInfo>();
-            //foreach (var item in dirs)
-            //{
-            //    FileItemInfo fi = new FileItemInfo() { DirectoryName = item.DirName };
+            //objStopWatch.Start();
+            // Get a cross join of the files that match and where the directories are different
+            // This will then be used to create the tree structure
+            //var crossJoinFile = from s in fileTree
+            //                    from t in fileTree
+            //                    where s.DirectoryName != t.DirectoryName && s.Name == t.Name
+            //                    orderby s.DirectoryName, t.DirectoryName
+            //                    select new FileItemInfoFlat { DirectoryNameFirst = s.DirectoryName, DirectoryNameSecond = t.DirectoryName, FileInfo = s };
+            
+            //Console.WriteLine(string.Format("Time Taken Cross Join: {0}", objStopWatch.Elapsed.TotalSeconds));
 
-            //    string childDir = "";
-            //    foreach (var file in fileTree.Where(x => x.DirectoryName == item.DirName))
-            //    {
-            //        var tr = from s in fileTree
-            //                 where s.DirectoryName != file.DirectoryName && file.Name.Contains(s.Name)
-            //                 select s;
+            //objStopWatch.Reset();
+            objStopWatch.Start();
 
-            //        FileItemInfo childDirItem = null;
-            //        foreach (var dupFile in tr)
-            //        {
-            //            // Get distinct directories
-            //            if (childDir != dupFile.DirectoryName)
-            //            {
-            //                if (childDir != "")
-            //                {
-            //                    fi.Children.Add(childDirItem);
-            //                }
+            var crossJoinFile = from s in fileTree
+                                join t in fileTree on s.Name equals t.Name
+                                where s.DirectoryName != t.DirectoryName
+                                orderby s.DirectoryName, t.DirectoryName
+                                select new FileItemInfoFlat { DirectoryNameFirst = s.DirectoryName, DirectoryNameSecond = t.DirectoryName, FileInfo = s };
 
-            //                childDirItem = new FileItemInfo() { DirectoryName = dupFile.DirectoryName, Children = new List<FileItemInfo>() };
-            //            }
 
-            //            childDirItem.Children.Add(new FileItemInfo() { FileInfo = dupFile });
-            //        }
-            //        fil.Add(fi);
-            //    }
-            //}
-            //return fil;
-            var test = from s in fileTree
-                       from t in fileTree
-                       where s.DirectoryName != t.DirectoryName && s.Name == t.Name
-                       orderby s.DirectoryName, t.DirectoryName
-                       select new FileItemInfoFlat { DirectoryNameA = s.DirectoryName, DirectoryNameB = t.DirectoryName, FileInfo = s };
+            //var crossJoinFileTest = fileTree.SelectMany(t1 => fileTree.Select(t2 => Tuple.Create(t1, t2)))
+            //    .Where(t => t.Item1.DirectoryName == t.Item2.DirectoryName && t.Item1.Name == t.Item2.Name)
+            //    .Select(v => new FileItemInfoFlat { DirectoryNameFirst = v.Item1.DirectoryName, DirectoryNameSecond = v.Item2.DirectoryName, FileInfo = v.Item1 }).ToList();
 
-            var tree = from s in test
-                       group s by s.DirectoryNameA into grpA
-                       select new FileTreeDirectory()
+            Console.WriteLine(string.Format("Time Taken Inner Join Execution: {0}", objStopWatch.Elapsed.TotalSeconds));
+            objStopWatch.Reset();
+            objStopWatch.Start();
+           
+            // Process to list initially as this is more optimal than to do this later on as it would be done 3 times if it were deferred to the next statement
+            var crossJoinFileList = crossJoinFile.ToList();
+            Console.WriteLine(string.Format("Time Taken Cross Join Execution: {0}", objStopWatch.Elapsed.TotalSeconds));
+
+            objStopWatch.Reset();
+            objStopWatch.Start();
+
+            // Create a tree view from the cross join. Each child will be have its own cross join set which is joined to the parent.
+            // The comparison is based on the directory and file name. 
+            // TODO: This can be improved so that files that are the same but have different name can be compared.
+            var tree = from s in crossJoinFileList
+                       group s by s.DirectoryNameFirst into grpA
+                       select new DuplicateFileTree()
                        {
-                           DirectoryName = grpA.FirstOrDefault().DirectoryNameA,
-                           DirList = (from v in test
-                                      where v.DirectoryNameA == grpA.FirstOrDefault().DirectoryNameA
-                                      group v by v.DirectoryNameB into grpB
-                                      select new FileDirectoryInfo()
+                           DirectoryName = grpA.FirstOrDefault().DirectoryNameFirst,
+                           DirList = (from v in crossJoinFileList
+                                      where v.DirectoryNameFirst == grpA.FirstOrDefault().DirectoryNameFirst
+                                      group v by v.DirectoryNameSecond into grpB
+                                      select new DuplicateDirectoryList()
                                       {
-                                          DirectoryName = grpB.FirstOrDefault().DirectoryNameB,
-                                          Children = (from t in test
-                                                      where t.DirectoryNameA == grpB.FirstOrDefault().DirectoryNameA
-                                                      && t.DirectoryNameB == grpB.FirstOrDefault().DirectoryNameB
+                                          DirectoryName = grpB.FirstOrDefault().DirectoryNameSecond,
+                                          Children = (from t in crossJoinFileList
+                                                      where t.DirectoryNameFirst == grpB.FirstOrDefault().DirectoryNameFirst
+                                                      && t.DirectoryNameSecond == grpB.FirstOrDefault().DirectoryNameSecond
                                                       select new FileItemInfo()
                                            {
-                                               DirectoryName = t.DirectoryNameB,
+                                               DirectoryName = t.DirectoryNameSecond,
                                                FileInfo = t.FileInfo
                                            }).ToList()
                                       }).ToList()
                        };
-            var x = 1;
-            //var tree =
-            //          from s in fileTree
-            //          group s by s.DirectoryName into g
-            //          select new FileItemInfo()
-            //          {
-            //              DirectoryName = g.FirstOrDefault().DirectoryName,
-            //              FileInfo = g.FirstOrDefault(),
-            //              Unknown = g,
-            //              Children = (from c in fileTree
-            //                          where c.Name.Contains(g.FirstOrDefault().Name)
-            //                          // && c.DirectoryName != g.FirstOrDefault().DirectoryName
-            //                          group c by c.DirectoryName into g2
-            //                          select new FileItemInfo()
-            //                          {
-            //                              Unknown = g2, // this should sovle the issue
-            //                              FileInfo = g2.FirstOrDefault(),
-            //                              DirectoryName = g2.FirstOrDefault().DirectoryName,
-            //                              Children = g2.Select(t => new FileItemInfo() { FileInfo = t }).ToList()
-            //                          }).ToList()
-            //          };
+
+            Console.WriteLine(string.Format("Time Taken Tree: {0}", objStopWatch.Elapsed.TotalSeconds));
+
             return tree;
         }
 
@@ -318,32 +279,11 @@ namespace JG.Duplicates.Client
         #endregion // INotifyPropertyChanged Members
     }
 
-    public class FileTreeDirectory
-    {
-        public string DirectoryName { get; set; }
-
-        public List<FileDirectoryInfo> DirList { get; set; }
-    }
-
-    public class FileDirectoryInfo
-    {
-        public string DirectoryName { get; set; }
-
-        public List<FileItemInfo> Children { get; set; }
-    }
-
-    public class FileItemInfo
-    {
-        public string DirectoryName { get; set; }
-
-        public FileInfo FileInfo { get; set; }
-    }
-
     public class FileItemInfoFlat
     {
-        public string DirectoryNameA { get; set; }
+        public string DirectoryNameFirst { get; set; }
 
-        public string DirectoryNameB { get; set; }
+        public string DirectoryNameSecond { get; set; }
 
         public FileInfo FileInfo { get; set; }
 

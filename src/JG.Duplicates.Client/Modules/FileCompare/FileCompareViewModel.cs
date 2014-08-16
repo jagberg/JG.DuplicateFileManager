@@ -51,6 +51,20 @@ namespace JG.Duplicates.Client.Modules
             }
         }
 
+        private string _processingStatus;
+        public string ProcessingStatus
+        {
+            set
+            {
+                this._processingStatus = value;
+                OnPropertyChanged("ProcessingStatus");
+            }
+            get
+            {
+                return this._processingStatus;
+            }
+        }
+
         private List<FileCompareInfo> _duplicateList;
         public List<FileCompareInfo> DuplicateList
         {
@@ -97,8 +111,17 @@ namespace JG.Duplicates.Client.Modules
 
         private void LoadComparison()
         {
-            FileCompare fileCompare = new FileCompare();
-            this.DuplicateList = fileCompare.GetDuplicateFiles(this.FirstLocation, this.SecondLocation);
+            try
+            {
+                FileCompare fileCompare = new FileCompare();
+                this.DuplicateList = fileCompare.GetDuplicateFiles(this.FirstLocation, this.SecondLocation);
+
+                this.ProcessingStatus = string.Empty;                
+            }
+            catch (Exception ex)
+            {
+                this.ProcessingStatus = ex.Message;
+            }
         }
 
         protected virtual void OnPropertyChanged(string propertyName)

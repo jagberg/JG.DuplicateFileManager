@@ -101,6 +101,9 @@
     </ApplicationDefinition>
     <Compile Include="Events\FileSelectionEvent.cs" />
     <Compile Include="Events\FileSelectionEventArgs.cs" />
+    <Compile Include="Models\DuplicateDirectoryList.cs" />
+    <Compile Include="Models\FileItemInfo.cs" />
+    <Compile Include="Models\FileTreeDirectory.cs" />
     <Compile Include="Modules\DuplicateFiles\DuplicateFilesModule.cs" />
     <Compile Include="Modules\DuplicateFiles\DuplicateFilesView.xaml.cs">
       <DependentUpon>DuplicateFilesView.xaml</DependentUpon>
@@ -183,6 +186,7 @@
       <Name>JG.DuplicateFiles</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

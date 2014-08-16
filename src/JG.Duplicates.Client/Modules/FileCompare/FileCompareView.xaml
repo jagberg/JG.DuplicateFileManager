@@ -12,6 +12,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="96"/>
+            <RowDefinition Height="28"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -33,7 +34,8 @@
             <Button Content="Compare" Command="{Binding LoadCompareClickCommand}"  Foreground="Black" Margin="4,4,4,4"  Grid.Column="2" Grid.Row="2" Width="120" HorizontalAlignment="Right" />
 
         </Grid>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding DuplicateList}" AutoGenerateColumns="False">
+        <Label Grid.Row="1" Content="{Binding ProcessingStatus}" Foreground="Red"/>
+        <DataGrid Grid.Row="2" ItemsSource="{Binding DuplicateList}" AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Path=DuplicateFileInfo.Name}" Header="File Name" />
                 <DataGridTextColumn Binding="{Binding Path=DuplicateFileInfo.DirectoryName}" Header="Directory" Width="*" />
