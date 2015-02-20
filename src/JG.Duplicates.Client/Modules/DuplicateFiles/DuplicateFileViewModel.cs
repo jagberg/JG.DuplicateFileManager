@@ -15,6 +15,7 @@ using JG.Duplicates.Client.Events;
 using System.IO;
 using System.Collections;
 using JG.Duplicates.Client.Behaviours;
+using JG.DuplicateFiles.Engine;
 
 namespace JG.Duplicates.Client
 {

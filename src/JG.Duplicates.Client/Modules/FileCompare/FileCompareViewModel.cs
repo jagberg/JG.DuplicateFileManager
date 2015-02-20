@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using JG.DuplicateFiles.Engine;
 
 namespace JG.Duplicates.Client.Modules
 {

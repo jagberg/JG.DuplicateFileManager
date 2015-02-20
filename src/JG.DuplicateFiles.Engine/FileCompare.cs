@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JG.DuplicateFiles
+namespace JG.DuplicateFiles.Engine
 {
     public class FileCompare
     {
@@ -40,7 +40,7 @@ namespace JG.DuplicateFiles
                                                             .Where(f => extensions.Contains(f.Extension, StringComparer.OrdinalIgnoreCase));
 
 
-            FileComparer fileCompare = new FileComparer();
+            FileInfoComparer fileCompare = new FileInfoComparer();
 
             var distinctFiles = sourceFiles.Intersect(comparisonLocationFiles, fileCompare)
                 .Select(t => new FileCompareInfo()
