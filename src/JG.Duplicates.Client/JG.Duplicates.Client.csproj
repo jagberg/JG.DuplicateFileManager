@@ -99,11 +99,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Behaviours\FrameworkElementAdorner.cs" />
+    <Compile Include="Behaviours\FrameworkElementDragBehaviour.cs" />
+    <Compile Include="Behaviours\FrameworkElementDropBehaviour.cs" />
+    <Compile Include="Behaviours\IDraggable.cs" />
+    <Compile Include="Behaviours\IDroppable.cs" />
+    <Compile Include="Behaviours\TreeViewSelectedItemBehavior.cs" />
     <Compile Include="Events\FileSelectionEvent.cs" />
     <Compile Include="Events\FileSelectionEventArgs.cs" />
     <Compile Include="Models\DuplicateDirectoryList.cs" />
     <Compile Include="Models\FileItemInfo.cs" />
-    <Compile Include="Models\FileTreeDirectory.cs" />
+    <Compile Include="Models\DuplicateFileTree.cs" />
     <Compile Include="Models\ITreeItem.cs" />
     <Compile Include="Modules\DuplicateFiles\DuplicateFilesModule.cs" />
     <Compile Include="Modules\DuplicateFiles\DuplicateFilesView.xaml.cs">

@@ -18,6 +18,16 @@ namespace JG.DuplicateFiles
 
         public List<FileCompareInfo> GetDuplicateFiles(string sourceLocation, string comparisonLocation)
         {
+            if (!Directory.Exists(sourceLocation))
+            {
+                throw new Exception(string.Format("Source Location doesnt exist: {0}", sourceLocation));
+            }
+
+            if (!Directory.Exists(comparisonLocation))
+            {
+                throw new Exception(string.Format("Comparison Location doesnt exist: {0}", comparisonLocation));
+            }
+
             DirectoryInfo sourceDirectory = new DirectoryInfo(sourceLocation);
             DirectoryInfo comparisonDirectory = new DirectoryInfo(comparisonLocation);
 

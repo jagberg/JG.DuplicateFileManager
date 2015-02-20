@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:local="clr-namespace:JG.Duplicates.Client.Modules"
+             xmlns:b="clr-namespace:JG.Duplicates.Client.Behaviours"
              mc:Ignorable="d" 
              d:DesignHeight="350" d:DesignWidth="725" Loaded="UserControl_Loaded">
     <Grid>
@@ -42,8 +43,8 @@
             </Grid>
             <TreeView ItemsSource="{Binding MyFileTree}" Margin="2" Grid.Row="1" >
                 <i:Interaction.Behaviors>
-                    <local:TreeViewSelectedItemBehavior
-                    SelectedItem="{Binding SelectedFileItem}" />
+                    <b:TreeViewSelectedItemBehavior SelectedItem="{Binding SelectedFileItem}" />
+                    <b:FrameworkElementDragBehavior/>
                 </i:Interaction.Behaviors>
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding DirList}">

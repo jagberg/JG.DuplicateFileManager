@@ -14,10 +14,11 @@ using Microsoft.Practices.Unity;
 using JG.Duplicates.Client.Events;
 using System.IO;
 using System.Collections;
+using JG.Duplicates.Client.Behaviours;
 
 namespace JG.Duplicates.Client
 {
-    public class DuplicateFileViewModel : INotifyPropertyChanged, IDuplicateFileViewModel
+    public class DuplicateFileViewModel : INotifyPropertyChanged, IDuplicateFileViewModel, IDraggable
     {
         private List<DuplicateFileTree> _fileTree;
         private string _rootLocation;
@@ -93,7 +94,7 @@ namespace JG.Duplicates.Client
             {
                 this._selectedFileItem = value;
 
-                PublishFileSelectionChanged(this._selectedFileItem);
+                //PublishFileSelectionChanged(this._selectedFileItem);
 
                 OnPropertyChanged("SelectedFileItem");
             }
@@ -285,6 +286,11 @@ namespace JG.Duplicates.Client
         }
 
         #endregion // INotifyPropertyChanged Members
+
+        public object DragItem
+        {
+            get { return this.SelectedFileItem; }
+        }
     }
 
     public class FileItemInfoFlat

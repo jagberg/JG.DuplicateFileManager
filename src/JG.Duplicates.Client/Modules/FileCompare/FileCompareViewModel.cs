@@ -1,5 +1,6 @@
 ﻿using JG.DuplicateFiles;
 using JG.DuplicateFiles.Domain;
+using JG.Duplicates.Client.Behaviours;
 using JG.Duplicates.Client.Events;
 using Microsoft.Practices.Prism.PubSubEvents;
 using System;
@@ -8,15 +9,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace JG.Duplicates.Client.Modules
 {
-    public class FileCompareViewModel : INotifyPropertyChanged, JG.Duplicates.Client.Modules.IFileCompareViewModel
+    public class FileCompareViewModel : INotifyPropertyChanged, IFileCompareViewModel, IDroppable
     {
         private readonly IEventAggregator eventAggregator;
 
-        #region INotifyPropertyChanged Members
 
         private ICommand _loadCompareCommand;
         private bool _canLoadCompareExecute = true;
@@ -124,6 +125,8 @@ namespace JG.Duplicates.Client.Modules
             }
         }
 
+        #region INotifyPropertyChanged Members
+
         protected virtual void OnPropertyChanged(string propertyName)
         {
             if (this.PropertyChanged != null)
@@ -133,5 +136,15 @@ namespace JG.Duplicates.Client.Modules
         }
 
         #endregion // INotifyPropertyChanged Members
+
+        public Type DataType
+        {
+            get { return typeof(DuplicateFileTree); }
+        }
+
+        public void Drop(object data, FrameworkElement element)
+        {
+            ((System.Windows.Controls.TextBox)element).Text = ((ITreeItem)data).DirectoryName.FullName;
+        }
     }
 }
