@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JG.DuplicateFiles
+namespace JG.DuplicateFiles.Engine
 {
-    public class DirectoryComparer : System.Collections.Generic.IEqualityComparer<System.IO.DirectoryInfo>
+    internal class DirectoryInfoComparer : System.Collections.Generic.IEqualityComparer<System.IO.DirectoryInfo>
     {
         public bool Equals(System.IO.DirectoryInfo first, System.IO.DirectoryInfo second)
         {

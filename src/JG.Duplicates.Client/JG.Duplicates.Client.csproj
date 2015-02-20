@@ -188,9 +188,9 @@
       <Project>{00b41388-b5c8-4f40-bfb6-df1a94118f66}</Project>
       <Name>JG.DuplicateFiles.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\JG.DuplicateFiles.Service\JG.DuplicateFiles.Service.csproj">
+    <ProjectReference Include="..\JG.DuplicateFiles.Engine\JG.DuplicateFiles.Engine.csproj">
       <Project>{a629c91a-d8cb-4cba-9fff-4a53484b9bc8}</Project>
-      <Name>JG.DuplicateFiles</Name>
+      <Name>JG.DuplicateFiles.Engine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

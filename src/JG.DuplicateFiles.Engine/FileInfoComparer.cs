@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JG.DuplicateFiles
+namespace JG.DuplicateFiles.Engine
 {
-    public class FileComparer : System.Collections.Generic.IEqualityComparer<System.IO.FileInfo>
+    internal class FileInfoComparer : System.Collections.Generic.IEqualityComparer<System.IO.FileInfo>
     {
         public bool Equals(System.IO.FileInfo first, System.IO.FileInfo second)
         {

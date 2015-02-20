@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JG.DuplicateFiles
+namespace JG.DuplicateFiles.Engine
 {
-    public class FileTreeInfo
+    internal class FileTreeInfo
     {
         public FileTreeInfo()
         {
